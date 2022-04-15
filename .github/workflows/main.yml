@@ -1,0 +1,25 @@
+name: web
+on:
+  push:
+    branches:
+      - master
+
+env:
+  HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
+  APP_NAME: presentio-server-user
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Docker build
+        run: docker login --username=sunfline --password=$HEROKU_API_KEY registry.heroku.com
+
+      - name: Publish
+        run: |
+          heroku container:push web -a $APP_NAME
+          heroku container:release web -a $APP_NAME

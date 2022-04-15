@@ -12,8 +12,6 @@ type RegisterParams struct {
 	Token string `json:"token"`
 }
 
-var logger = log.Logger{}
-
 func registerHandler(c *gin.Context) {
 	var params RegisterParams
 
@@ -27,7 +25,6 @@ func registerHandler(c *gin.Context) {
 	payload, err := idtoken.Validate(context.Background(), params.Token, os.Getenv("GOOGLE_API_CLIENT_ID"))
 
 	if err != nil {
-		logger.Println(err.Error())
 		c.Status(403)
 		return
 	}
@@ -36,6 +33,7 @@ func registerHandler(c *gin.Context) {
 }
 
 func main() {
+	logger := log.Logger{}
 
 	router := gin.Default()
 

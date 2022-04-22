@@ -75,8 +75,15 @@ func registerHandler(config *Config) func(*gin.Context) {
 			return
 		}
 
+		token, err := createNewToken(user.ID)
+
+		if err != nil {
+			c.Status(500)
+			return
+		}
+
 		c.JSON(200, gin.H{
-			"token": createNewToken(user.ID),
+			"token": token,
 		})
 	}
 }

@@ -1,47 +1,54 @@
 package main
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/idtoken"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"os"
+	"presentio-server-user/src/v0"
+	"time"
 )
 
-type RegisterParams struct {
-	Token string `json:"token"`
-}
-
-func registerHandler(c *gin.Context) {
-	var params RegisterParams
-
-	err := c.ShouldBindJSON(&params)
+func createConn(dbUrl string) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dbUrl,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 
 	if err != nil {
-		c.Status(400)
-		return
+		return nil, err
 	}
 
-	payload, err := idtoken.Validate(context.Background(), params.Token, os.Getenv("GOOGLE_API_CLIENT_ID"))
+	sqlDb, _ := db.DB()
 
-	if err != nil {
-		c.Status(403)
-		return
-	}
+	sqlDb.SetConnMaxIdleTime(time.Minute * 10)
 
-	c.JSON(200, payload)
+	sqlDb.SetMaxIdleConns(10)
+
+	sqlDb.SetMaxOpenConns(100)
+
+	sqlDb.SetConnMaxLifetime(time.Hour)
+
+	return db, nil
 }
 
 func main() {
+	dbUrl := os.Getenv("DATABASE_URL")
+
+	db, err := createConn(dbUrl)
+
+	if err != nil {
+		log.Fatalf("Unable to connect to postgres database at %s\n", dbUrl)
+	}
+
 	logger := log.Logger{}
 
 	router := gin.Default()
 
-	v0 := router.Group("/v0")
+	v0.SetupRouter(router.Group("/v0"), &v0.Config{Db: db})
 
-	v0.POST("/user/register", registerHandler)
-
-	err := router.Run()
+	err = router.Run()
 
 	if err != nil {
 		logger.Fatalln("Failed to start server on port %s", os.Getenv("PORT"))

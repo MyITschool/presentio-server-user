@@ -71,17 +71,14 @@ func registerHandler(config *Config) func(*gin.Context) {
 		result = db.Create(&user)
 
 		if result.Error != nil {
-			fmt.Println("Failed to create user")
 			c.Status(500)
 			return
 		}
 
-		fmt.Printf("Created user with id %d\n", user.ID)
-
 		token, err := createNewToken(user.ID)
 
 		if err != nil {
-			fmt.Println("Failed to sign token")
+			fmt.Print(err.Error())
 			c.Status(500)
 			return
 		}

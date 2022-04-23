@@ -15,17 +15,20 @@ type Config struct {
 	Db *gorm.DB
 }
 
+var apiKey = os.Getenv("GOOGLE_API_CLIENT_ID")
+
 func SetupRouter(group *gin.RouterGroup, config *Config) {
-	group.POST("/user/register", registerHandler(config))
+	group.POST("/register", registerHandler(config))
+	group.POST("/authorize", authorizeHandler(config))
 }
 
-type RegisterParams struct {
+type UserParams struct {
 	Token string `json:"token"`
 }
 
 func registerHandler(config *Config) func(*gin.Context) {
 	return func(c *gin.Context) {
-		var params RegisterParams
+		var params UserParams
 
 		err := c.ShouldBindJSON(&params)
 
@@ -34,7 +37,7 @@ func registerHandler(config *Config) func(*gin.Context) {
 			return
 		}
 
-		payload, err := idtoken.Validate(context.Background(), params.Token, os.Getenv("GOOGLE_API_CLIENT_ID"))
+		payload, err := idtoken.Validate(context.Background(), params.Token, apiKey)
 
 		if err != nil {
 			c.Status(401)
@@ -73,6 +76,53 @@ func registerHandler(config *Config) func(*gin.Context) {
 		if result.Error != nil {
 			c.Status(500)
 			return
+		}
+
+		token, err := createNewToken(user.ID)
+
+		if err != nil {
+			c.Status(500)
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"token": token,
+		})
+	}
+}
+
+func authorizeHandler(config *Config) func(*gin.Context) {
+	return func(c *gin.Context) {
+		var params UserParams
+
+		err := c.ShouldBindJSON(params)
+
+		if err != nil {
+			c.Status(400)
+			return
+		}
+
+		payload, err := idtoken.Validate(context.Background(), params.Token, apiKey)
+
+		if err != nil {
+			c.Status(401)
+			return
+		}
+
+		email := fmt.Sprint(payload.Claims["email"])
+
+		db := config.Db
+
+		var user models.User
+
+		result := db.Where("email = ?", email).First(&user)
+
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				c.Status(403)
+			} else {
+				c.Status(500)
+			}
 		}
 
 		token, err := createNewToken(user.ID)

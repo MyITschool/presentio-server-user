@@ -1,30 +1,40 @@
 package v0
 
 import (
-	"fmt"
-	"github.com/golang-jwt/jwt"
+	"crypto/rsa"
+	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"time"
 )
 
 type UserClaims struct {
-	*jwt.StandardClaims
+	*jwt.RegisteredClaims
 
 	ID int64
 }
 
-var signKey = os.Getenv("TOKEN_PRIVATE_KEY")
+var signKey *rsa.PrivateKey
+
+func init() {
+	var err error
+
+	signKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("TOKEN_PRIVATE_KEY")))
+
+	if err != nil {
+		panic("Unable to read RSA private key")
+	}
+}
 
 func createNewToken(id int64) (string, error) {
-	fmt.Println(signKey)
-	token := jwt.New(jwt.GetSigningMethod("RS256"))
+	token := jwt.New(jwt.SigningMethodRS256)
 
 	token.Claims = &UserClaims{
-		&jwt.StandardClaims{
-
-			ExpiresAt: time.Now().Add(time.Minute * 1).Unix(),
+		RegisteredClaims: &jwt.RegisteredClaims{
+			ExpiresAt: &jwt.NumericDate{
+				Time: time.Now().Add(time.Minute * 5),
+			},
 		},
-		id,
+		ID: id,
 	}
 
 	return token.SignedString(signKey)

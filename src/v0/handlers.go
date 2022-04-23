@@ -78,12 +78,9 @@ func registerHandler(config *Config) func(*gin.Context) {
 		token, err := createNewToken(user.ID)
 
 		if err != nil {
-			fmt.Print(err.Error())
 			c.Status(500)
 			return
 		}
-
-		fmt.Println("Created user")
 
 		c.JSON(200, gin.H{
 			"token": token,

@@ -9,12 +9,12 @@ import (
 type UserClaims struct {
 	*jwt.StandardClaims
 
-	ID string
+	ID int64
 }
 
 var signKey = os.Getenv("TOKEN_PRIVATE_KEY")
 
-func createNewToken(id string) (string, error) {
+func createNewToken(id int64) (string, error) {
 	token := jwt.New(jwt.GetSigningMethod("RS256"))
 
 	token.Claims = &UserClaims{

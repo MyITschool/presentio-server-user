@@ -36,13 +36,13 @@ func init() {
 	}
 }
 
-func createNewAccessToken(id int64) (string, error) {
+func CreateNewAccessToken(id int64) (string, error) {
 	return createNewToken(id, &jwt.NumericDate{
 		Time: time.Now().Add(time.Minute * 5),
 	}, accessSignKey)
 }
 
-func createNewRefreshToken(id int64) (string, error) {
+func CreateNewRefreshToken(id int64) (string, error) {
 	return createNewToken(id, &jwt.NumericDate{
 		Time: time.Now().AddDate(0, 1, 0),
 	}, refreshSignKey)
@@ -64,19 +64,19 @@ func createNewToken(id int64, expires *jwt.NumericDate, key *rsa.PrivateKey) (st
 	return token.SignedString(key)
 }
 
-func validateAccessTokenHeader(authHeader string) (*jwt.Token, error) {
+func ValidateAccessTokenHeader(authHeader string) (*jwt.Token, error) {
 	return validateTokenHeader(authHeader, accessValidateKey)
 }
 
-func validateAccessToken(tokenStr string) (*jwt.Token, error) {
+func ValidateAccessToken(tokenStr string) (*jwt.Token, error) {
 	return validateToken(tokenStr, accessValidateKey)
 }
 
-func validateRefreshTokenHeader(authHeader string) (*jwt.Token, error) {
+func ValidateRefreshTokenHeader(authHeader string) (*jwt.Token, error) {
 	return validateTokenHeader(authHeader, refreshValidateKey)
 }
 
-func validateRefreshToken(tokenStr string) (*jwt.Token, error) {
+func ValidateRefreshToken(tokenStr string) (*jwt.Token, error) {
 	return validateToken(tokenStr, refreshValidateKey)
 }
 

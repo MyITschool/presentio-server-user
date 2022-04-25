@@ -105,7 +105,7 @@ func (h *AuthHandler) register(c *gin.Context) {
 func (h *AuthHandler) authorize(c *gin.Context) {
 	var params AuthParams
 
-	err := c.ShouldBindJSON(params)
+	err := c.ShouldBindJSON(&params)
 
 	if err != nil {
 		c.Status(400)

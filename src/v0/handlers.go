@@ -14,5 +14,5 @@ type Config struct {
 func SetupRouter(group *gin.RouterGroup, config *Config) {
 	userRepo := repo.CreateUserRepo(config.Db)
 
-	handlers.CreateAuthHandler(group.Group("/auth"), config, userRepo)
+	handlers.CreateAuthHandler(group.Group("/auth"), userRepo)
 }

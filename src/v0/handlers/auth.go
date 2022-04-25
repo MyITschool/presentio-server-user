@@ -9,13 +9,12 @@ import (
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
 	"os"
-	v0 "presentio-server-user/src/v0"
 	"presentio-server-user/src/v0/repo"
+	"presentio-server-user/src/v0/util"
 	"strconv"
 )
 
 type AuthHandler struct {
-	Config   *v0.Config
 	UserRepo repo.UserRepo
 }
 
@@ -25,9 +24,8 @@ type AuthParams struct {
 
 var apiKey = os.Getenv("GOOGLE_API_CLIENT_ID")
 
-func CreateAuthHandler(group *gin.RouterGroup, config *v0.Config, userRepo repo.UserRepo) {
+func CreateAuthHandler(group *gin.RouterGroup, userRepo repo.UserRepo) {
 	handler := AuthHandler{
-		Config:   config,
 		UserRepo: userRepo,
 	}
 
@@ -84,14 +82,14 @@ func (h *AuthHandler) register(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := v0.CreateNewAccessToken(user.ID)
+	accessToken, err := util.CreateNewAccessToken(user.ID)
 
 	if err != nil {
 		c.Status(500)
 		return
 	}
 
-	refreshToken, err := v0.CreateNewRefreshToken(user.ID)
+	refreshToken, err := util.CreateNewRefreshToken(user.ID)
 
 	if err != nil {
 		c.Status(500)
@@ -135,14 +133,14 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := v0.CreateNewAccessToken(user.ID)
+	accessToken, err := util.CreateNewAccessToken(user.ID)
 
 	if err != nil {
 		c.Status(500)
 		return
 	}
 
-	refreshToken, err := v0.CreateNewRefreshToken(user.ID)
+	refreshToken, err := util.CreateNewRefreshToken(user.ID)
 
 	if err != nil {
 		c.Status(500)
@@ -158,7 +156,7 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 func (h *AuthHandler) get(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 
-	token, err := v0.ValidateAccessTokenHeader(authHeader)
+	token, err := util.ValidateAccessTokenHeader(authHeader)
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenMalformed) {
@@ -172,7 +170,7 @@ func (h *AuthHandler) get(c *gin.Context) {
 		return
 	}
 
-	claims, ok := token.Claims.(*v0.UserClaims)
+	claims, ok := token.Claims.(*util.UserClaims)
 
 	if !ok {
 		c.Status(403)
@@ -211,7 +209,7 @@ func (h *AuthHandler) get(c *gin.Context) {
 func (h *AuthHandler) refresh(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 
-	token, err := v0.ValidateRefreshToken(authHeader)
+	token, err := util.ValidateRefreshToken(authHeader)
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenMalformed) {
@@ -225,14 +223,14 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 		return
 	}
 
-	claims, ok := token.Claims.(*v0.UserClaims)
+	claims, ok := token.Claims.(*util.UserClaims)
 
 	if !ok {
 		c.Status(403)
 		return
 	}
 
-	accessToken, err := v0.CreateNewAccessToken(claims.ID)
+	accessToken, err := util.CreateNewAccessToken(claims.ID)
 
 	if err != nil {
 		c.Status(500)

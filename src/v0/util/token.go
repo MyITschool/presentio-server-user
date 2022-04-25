@@ -1,4 +1,4 @@
-package v0
+package util
 
 import (
 	"crypto/rsa"
@@ -30,6 +30,18 @@ func init() {
 	}
 
 	accessValidateKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(os.Getenv("TOKEN_PUBLIC_KEY")))
+
+	if err != nil {
+		panic("Unable to read RSA public key")
+	}
+
+	refreshSignKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(os.Getenv("REFRESH_TOKEN_PRIVATE_KEY")))
+
+	if err != nil {
+		panic("Unable to read RSA private key")
+	}
+
+	refreshValidateKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(os.Getenv("REFRESH_TOKEN_PUBLIC_KEY")))
 
 	if err != nil {
 		panic("Unable to read RSA public key")

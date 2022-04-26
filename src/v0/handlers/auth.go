@@ -97,7 +97,7 @@ func (h *AuthHandler) register(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"accessToken":   accessToken,
+		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})
 }
@@ -148,7 +148,7 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"accessToken":   accessToken,
+		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})
 }
@@ -238,6 +238,6 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"token": accessToken,
+		"access_token": accessToken,
 	})
 }

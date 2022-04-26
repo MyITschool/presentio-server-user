@@ -11,7 +11,6 @@ import (
 	"os"
 	"presentio-server-user/src/v0/repo"
 	"presentio-server-user/src/v0/util"
-	"strconv"
 )
 
 type AuthHandler struct {
@@ -31,7 +30,6 @@ func CreateAuthHandler(group *gin.RouterGroup, userRepo repo.UserRepo) {
 
 	group.POST("/register", handler.register)
 	group.POST("/authorize", handler.authorize)
-	group.GET("/info/:id", handler.get)
 	group.GET("/refresh", handler.refresh)
 }
 
@@ -151,59 +149,6 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 		"accessToken":  accessToken,
 		"refreshToken": refreshToken,
 	})
-}
-
-func (h *AuthHandler) get(c *gin.Context) {
-	authHeader := c.GetHeader("Authorization")
-
-	token, err := util.ValidateAccessTokenHeader(authHeader)
-
-	if err != nil {
-		if errors.Is(err, jwt.ErrTokenMalformed) {
-			c.Status(406)
-		} else if errors.Is(err, jwt.ErrTokenExpired) {
-			c.Status(408)
-		} else {
-			c.Status(400)
-		}
-
-		return
-	}
-
-	claims, ok := token.Claims.(*util.UserClaims)
-
-	if !ok {
-		c.Status(403)
-		return
-	}
-
-	userId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-
-	if err != nil {
-		c.Status(404)
-		return
-	}
-
-	user, err := h.UserRepo.FindById(userId)
-
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.Status(404)
-		} else {
-			c.Status(500)
-		}
-
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"self": user.ID == claims.ID,
-		"user": user,
-	})
-
-	c.Header("Cache-Control", "public, max-age=18000")
-	c.Header("Pragma", "")
-	c.Header("Expires", "")
 }
 
 func (h *AuthHandler) refresh(c *gin.Context) {

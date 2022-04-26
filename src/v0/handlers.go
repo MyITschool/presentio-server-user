@@ -15,4 +15,5 @@ func SetupRouter(group *gin.RouterGroup, config *Config) {
 	userRepo := repo.CreateUserRepo(config.Db)
 
 	handlers.CreateAuthHandler(group.Group("/auth"), userRepo)
+	handlers.CreateUserHandler(group.Group("/user"), userRepo)
 }

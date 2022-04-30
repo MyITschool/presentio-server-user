@@ -99,7 +99,7 @@ func validateTokenHeader(authHeader string, key *rsa.PublicKey) (*jwt.Token, err
 
 	parts := strings.Split(authHeader, " ")
 
-	if len(parts) != 2 || parts[1] != "Bearer" {
+	if len(parts) != 2 || parts[0] != "Bearer" {
 		return nil, jwt.ErrTokenMalformed
 	}
 
@@ -107,7 +107,7 @@ func validateTokenHeader(authHeader string, key *rsa.PublicKey) (*jwt.Token, err
 }
 
 func validateToken(tokenStr string, key *rsa.PublicKey) (*jwt.Token, error) {
-	return jwt.ParseWithClaims(tokenStr, UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+	return jwt.ParseWithClaims(tokenStr, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	}, jwt.WithValidMethods([]string{"RS256"}))
 }

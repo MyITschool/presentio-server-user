@@ -6,4 +6,5 @@ type User struct {
 	LastName  string `json:"last_name" binding:"required"`
 	Email     string `json:"email" binding:"required"`
 	PFPUrl    string `json:"pfp_url" binding:"required"`
+	Bio       string `json:"bio" binding:"required"`
 }

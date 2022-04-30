@@ -154,7 +154,7 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 func (h *AuthHandler) refresh(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 
-	token, err := util.ValidateRefreshToken(authHeader)
+	token, err := util.ValidateRefreshTokenHeader(authHeader)
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenMalformed) {

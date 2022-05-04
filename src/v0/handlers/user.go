@@ -78,13 +78,13 @@ func (h *UserHandler) doGetInfo(userId int64, c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"self": user.ID == claims.ID,
-		"user": user,
-	})
-
 	c.Header("Cache-Control", "public, max-age=18000")
 	c.Header("Vary", "Authorization")
 	c.Header("Pragma", "")
 	c.Header("Expires", "")
+
+	c.JSON(200, gin.H{
+		"self": user.ID == claims.ID,
+		"user": user,
+	})
 }

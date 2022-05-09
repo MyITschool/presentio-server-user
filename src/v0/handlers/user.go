@@ -78,8 +78,15 @@ func (h *UserHandler) doGetInfo(userId int64, c *gin.Context) {
 		return
 	}
 
-	c.Header("Cache-Control", "public, max-age=18000")
-	c.Header("Vary", "Authorization")
+	cache := "public, max-age="
+
+	if userId == -1 {
+		cache += "300"
+	} else {
+		cache += "18000"
+	}
+
+	c.Header("Cache-Control", cache)
 	c.Header("Pragma", "")
 	c.Header("Expires", "")
 

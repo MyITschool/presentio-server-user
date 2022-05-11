@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
 	"os"
@@ -157,13 +156,7 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 	token, err := util.ValidateRefreshTokenHeader(authHeader)
 
 	if err != nil {
-		if errors.Is(err, jwt.ErrTokenMalformed) {
-			c.Status(406)
-		} else if errors.Is(err, jwt.ErrTokenExpired) {
-			c.Status(408)
-		} else {
-			c.Status(400)
-		}
+		util.HandleTokenError(err, c)
 
 		return
 	}

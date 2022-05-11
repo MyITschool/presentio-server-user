@@ -3,7 +3,6 @@ package handlers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
 	"presentio-server-user/src/v0/repo"
 	"presentio-server-user/src/v0/util"
@@ -44,13 +43,7 @@ func (h *UserHandler) doGetInfo(userId int64, c *gin.Context) {
 	token, err := util.ValidateAccessTokenHeader(authHeader)
 
 	if err != nil {
-		if errors.Is(err, jwt.ErrTokenMalformed) {
-			c.Status(406)
-		} else if errors.Is(err, jwt.ErrTokenExpired) {
-			c.Status(408)
-		} else {
-			c.Status(400)
-		}
+		util.HandleTokenError(err, c)
 
 		return
 	}

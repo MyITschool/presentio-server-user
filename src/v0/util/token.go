@@ -2,6 +2,8 @@ package util
 
 import (
 	"crypto/rsa"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"strings"
@@ -110,4 +112,14 @@ func validateToken(tokenStr string, key *rsa.PublicKey) (*jwt.Token, error) {
 	return jwt.ParseWithClaims(tokenStr, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	}, jwt.WithValidMethods([]string{"RS256"}))
+}
+
+func HandleTokenError(err error, c *gin.Context) {
+	if errors.Is(err, jwt.ErrTokenMalformed) {
+		c.Status(406)
+	} else if errors.Is(err, jwt.ErrTokenExpired) {
+		c.Status(408)
+	} else {
+		c.Status(400)
+	}
 }

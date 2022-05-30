@@ -42,28 +42,28 @@ func (r *UserRepo) Create(user *models.User) error {
 
 func (r *UserRepo) IncrementFollowers(userId int64) (int64, error) {
 	tx := r.db.
-		Exec("UPDATE users SET followers = followers + 1 WHERE user_id = ?", userId)
+		Exec("UPDATE users SET followers = followers + 1 WHERE id = ?", userId)
 
 	return tx.RowsAffected, tx.Error
 }
 
 func (r *UserRepo) DecrementFollowers(userId int64) (int64, error) {
 	tx := r.db.
-		Exec("UPDATE users SET followers = followers - 1 WHERE user_id = ?", userId)
+		Exec("UPDATE users SET followers = followers - 1 WHERE id = ?", userId)
 
 	return tx.RowsAffected, tx.Error
 }
 
 func (r *UserRepo) IncrementFollowing(userId int64) (int64, error) {
 	tx := r.db.
-		Exec("UPDATE users SET following = following + 1 WHERE user_id = ?", userId)
+		Exec("UPDATE users SET following = following + 1 WHERE id = ?", userId)
 
 	return tx.RowsAffected, tx.Error
 }
 
 func (r *UserRepo) DecrementFollowing(userId int64) (int64, error) {
 	tx := r.db.
-		Exec("UPDATE users SET following = following - 1 WHERE user_id = ?", userId)
+		Exec("UPDATE users SET following = following - 1 WHERE id = ?", userId)
 
 	return tx.RowsAffected, tx.Error
 }

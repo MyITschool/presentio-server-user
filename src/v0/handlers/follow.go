@@ -140,16 +140,13 @@ func (h *FollowHandler) unfollowUser(c *gin.Context) {
 			return err
 		}
 
-		_, err = userRepo.DecrementFollowers(claims.ID)
+		_, err = userRepo.DecrementFollowing(claims.ID)
 
 		if err != nil {
 			return err
 		}
 
-		_, err = followRepo.Delete(&models.Follow{
-			FromID: claims.ID,
-			ToID:   userId,
-		})
+		_, err = followRepo.Delete(claims.ID, userId)
 
 		if err != nil {
 			return err

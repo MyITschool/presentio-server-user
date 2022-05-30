@@ -35,8 +35,10 @@ func (r *FollowRepo) Create(follow *models.Follow) error {
 	return r.db.Create(follow).Error
 }
 
-func (r *FollowRepo) Delete(follow *models.Follow) (int64, error) {
-	tx := r.db.Delete(follow)
+func (r *FollowRepo) Delete(fromId int64, toId int64) (int64, error) {
+	tx := r.db.
+		Where("from_id = ? and to_id = ?", fromId, toId).
+		Delete(&models.Follow{})
 
 	return tx.RowsAffected, tx.Error
 }

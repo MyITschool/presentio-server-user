@@ -22,11 +22,7 @@ type AuthParams struct {
 
 var apiKey = os.Getenv("GOOGLE_API_CLIENT_ID")
 
-func CreateAuthHandler(group *gin.RouterGroup, userRepo repo.UserRepo) {
-	handler := AuthHandler{
-		UserRepo: userRepo,
-	}
-
+func SetupAuthHandler(group *gin.RouterGroup, handler *AuthHandler) {
 	group.POST("/register", handler.register)
 	group.POST("/authorize", handler.authorize)
 	group.GET("/refresh", handler.refresh)
@@ -156,7 +152,7 @@ func (h *AuthHandler) refresh(c *gin.Context) {
 	token, err := util.ValidateRefreshTokenHeader(authHeader)
 
 	if err != nil {
-		util.HandleTokenError(err, c)
+		c.Status(util.HandleTokenError(err))
 
 		return
 	}

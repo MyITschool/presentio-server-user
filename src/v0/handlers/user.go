@@ -13,11 +13,7 @@ type UserHandler struct {
 	UserRepo repo.UserRepo
 }
 
-func CreateUserHandler(group *gin.RouterGroup, userRepo repo.UserRepo) {
-	handler := UserHandler{
-		UserRepo: userRepo,
-	}
-
+func SetupUserHandler(group *gin.RouterGroup, handler *UserHandler) {
 	group.GET("/info/:id", handler.getInfo)
 	group.GET("/info/self", handler.getInfoSelf)
 }
@@ -43,7 +39,7 @@ func (h *UserHandler) doGetInfo(userId int64, c *gin.Context) {
 	token, err := util.ValidateAccessTokenHeader(authHeader)
 
 	if err != nil {
-		util.HandleTokenError(err, c)
+		c.Status(util.HandleTokenError(err))
 
 		return
 	}

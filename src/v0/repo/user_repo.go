@@ -36,3 +36,17 @@ func (r *UserRepo) Create(user *models.User) error {
 
 	return result.Error
 }
+
+func (r *UserRepo) IncrementFollowers(userId int64) (int64, error) {
+	tx := r.db.
+		Exec("UPDATE users SET followers = followers + 1 WHERE user_id = ?", userId)
+
+	return tx.RowsAffected, tx.Error
+}
+
+func (r *UserRepo) DecrementFollowers(userId int64) (int64, error) {
+	tx := r.db.
+		Exec("UPDATE users SET followers = followers - 1 WHERE user_id = ?", userId)
+
+	return tx.RowsAffected, tx.Error
+}

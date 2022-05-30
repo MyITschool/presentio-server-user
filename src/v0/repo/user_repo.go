@@ -27,7 +27,7 @@ func (r *UserRepo) FindById(id int64, myUserId int64) (*models.User, error) {
 	var user models.User
 
 	result := r.db.
-		Where("id = ?", id).
+		Where("users.id = ?", id).
 		Joins("Follow", r.db.Where(&models.Follow{FromID: myUserId, ToID: id})).
 		First(&user)
 

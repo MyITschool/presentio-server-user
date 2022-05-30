@@ -55,7 +55,7 @@ func (h *UserHandler) doGetInfo(userId int64, c *gin.Context) {
 		userId = claims.ID
 	}
 
-	user, err := h.UserRepo.FindById(userId)
+	user, err := h.UserRepo.FindById(userId, claims.ID)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

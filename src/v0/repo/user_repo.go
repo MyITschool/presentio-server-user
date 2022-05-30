@@ -23,10 +23,13 @@ func (r *UserRepo) FindByEmail(email string) (*models.User, error) {
 	return &user, result.Error
 }
 
-func (r *UserRepo) FindById(id int64) (*models.User, error) {
+func (r *UserRepo) FindById(id int64, myUserId int64) (*models.User, error) {
 	var user models.User
 
-	result := r.db.Where("id = ?", id).First(&user)
+	result := r.db.
+		Where("id = ?", id).
+		Joins("Follow", r.db.Where(&models.Follow{FromID: myUserId, ToID: id})).
+		First(&user)
 
 	return &user, result.Error
 }

@@ -9,4 +9,5 @@ type User struct {
 	Bio       string `json:"bio" binding:"required"`
 	Followers int64  `json:"followers" binding:"required"`
 	Following int64  `json:"following" binding:"required"`
+	Follow    Follow `json:"follow" binding:"required"`
 }

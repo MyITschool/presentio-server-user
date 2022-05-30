@@ -16,6 +16,7 @@ type FollowHandler struct {
 
 func SetupFollowHandler(group *gin.RouterGroup, handler *FollowHandler) {
 	group.POST("/:id", handler.followUser)
+	group.DELETE("/:id", handler.unfollowUser)
 }
 
 func (h *FollowHandler) followUser(c *gin.Context) {

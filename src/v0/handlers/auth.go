@@ -8,6 +8,7 @@ import (
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
 	"os"
+	"presentio-server-user/src/v0/models"
 	"presentio-server-user/src/v0/repo"
 	"presentio-server-user/src/v0/util"
 )
@@ -47,7 +48,7 @@ func (h *AuthHandler) register(c *gin.Context) {
 
 	email := fmt.Sprint(payload.Claims["email"])
 
-	user, err := h.UserRepo.FindByEmail(email)
+	_, err = h.UserRepo.FindByEmail(email)
 
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -63,12 +64,14 @@ func (h *AuthHandler) register(c *gin.Context) {
 	lastName := fmt.Sprint(payload.Claims["family_name"])
 	pfp := fmt.Sprint(payload.Claims["picture"])
 
-	user.Email = email
-	user.FirstName = firstName
-	user.LastName = lastName
-	user.PFPUrl = pfp
+	user := models.User{
+		Email:     email,
+		FirstName: firstName,
+		LastName:  lastName,
+		PFPUrl:    pfp,
+	}
 
-	err = h.UserRepo.Create(user)
+	err = h.UserRepo.Create(&user)
 
 	if err != nil {
 		c.Status(500)

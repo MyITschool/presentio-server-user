@@ -67,6 +67,12 @@ func (h *FollowHandler) followUser(c *gin.Context) {
 			return err
 		}
 
+		_, err = userRepo.IncrementFollowing(claims.ID)
+
+		if err != nil {
+			return err
+		}
+
 		err = followRepo.Create(&models.Follow{
 			FromID: claims.ID,
 			ToID:   userId,
@@ -129,6 +135,12 @@ func (h *FollowHandler) unfollowUser(c *gin.Context) {
 			c.Status(404)
 			return nil
 		}
+
+		if err != nil {
+			return err
+		}
+
+		_, err = userRepo.DecrementFollowers(claims.ID)
 
 		if err != nil {
 			return err

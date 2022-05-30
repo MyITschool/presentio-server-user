@@ -8,4 +8,5 @@ type User struct {
 	PFPUrl    string `json:"pfpUrl" binding:"required"`
 	Bio       string `json:"bio" binding:"required"`
 	Followers int64  `json:"followers" binding:"required"`
+	Following int64  `json:"following" binding:"required"`
 }

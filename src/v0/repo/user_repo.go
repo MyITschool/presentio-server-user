@@ -50,3 +50,17 @@ func (r *UserRepo) DecrementFollowers(userId int64) (int64, error) {
 
 	return tx.RowsAffected, tx.Error
 }
+
+func (r *UserRepo) IncrementFollowing(userId int64) (int64, error) {
+	tx := r.db.
+		Exec("UPDATE users SET following = following + 1 WHERE user_id = ?", userId)
+
+	return tx.RowsAffected, tx.Error
+}
+
+func (r *UserRepo) DecrementFollowing(userId int64) (int64, error) {
+	tx := r.db.
+		Exec("UPDATE users SET following = following - 1 WHERE user_id = ?", userId)
+
+	return tx.RowsAffected, tx.Error
+}

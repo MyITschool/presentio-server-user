@@ -35,7 +35,7 @@ func (h *AuthHandler) register(c *gin.Context) {
 	err := c.ShouldBindJSON(&params)
 
 	if err != nil {
-		c.Status(400)
+		c.Status(422)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *AuthHandler) authorize(c *gin.Context) {
 	err := c.ShouldBindJSON(&params)
 
 	if err != nil {
-		c.Status(400)
+		c.Status(422)
 		return
 	}
 

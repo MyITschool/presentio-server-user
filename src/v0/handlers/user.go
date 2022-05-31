@@ -16,6 +16,40 @@ type UserHandler struct {
 func SetupUserHandler(group *gin.RouterGroup, handler *UserHandler) {
 	group.GET("/info/:id", handler.getInfo)
 	group.GET("/info/self", handler.getInfoSelf)
+	group.GET("/search/:page", handler.search)
+}
+
+func (h *UserHandler) search(c *gin.Context) {
+	token, err := util.ValidateAccessTokenHeader(c.GetHeader("Authorization"))
+
+	if err != nil {
+		c.Status(util.HandleTokenError(err))
+		return
+	}
+
+	page, err := strconv.Atoi(c.Param("page"))
+
+	if err != nil {
+		c.Status(404)
+
+		return
+	}
+
+	_, ok := token.Claims.(*util.UserClaims)
+
+	if !ok {
+		c.Status(403)
+		return
+	}
+
+	keywords := c.QueryArray("keyword")
+
+	users, err := h.UserRepo.FindByQuery(keywords, page)
+
+	c.Header("Cache-Control", "public, max-age=300")
+	c.Header("Pragma", "")
+	c.Header("Expires", "")
+	c.JSON(200, users)
 }
 
 func (h *UserHandler) getInfo(c *gin.Context) {

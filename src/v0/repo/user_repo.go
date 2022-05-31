@@ -3,6 +3,7 @@ package repo
 import (
 	"gorm.io/gorm"
 	"presentio-server-user/src/v0/models"
+	"strings"
 )
 
 type UserRepo struct {
@@ -66,4 +67,16 @@ func (r *UserRepo) DecrementFollowing(userId int64) (int64, error) {
 		Exec("UPDATE users SET following = following - 1 WHERE id = ?", userId)
 
 	return tx.RowsAffected, tx.Error
+}
+
+func (r *UserRepo) FindByQuery(keywords []string, page int) ([]models.User, error) {
+	var results []models.User
+
+	tx := r.db.
+		Where("name @@ to_tsquery(getUserLang(id), ?)", strings.Join(keywords, "&")).
+		Limit(20).
+		Offset(20 * page).
+		Find(&results)
+
+	return results, tx.Error
 }

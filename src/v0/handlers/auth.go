@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/abadojack/whatlanggo"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/api/idtoken"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ import (
 	"presentio-server-user/src/v0/models"
 	"presentio-server-user/src/v0/repo"
 	"presentio-server-user/src/v0/util"
+	"strings"
 )
 
 type AuthHandler struct {
@@ -60,14 +62,14 @@ func (h *AuthHandler) register(c *gin.Context) {
 		return
 	}
 
-	firstName := fmt.Sprint(payload.Claims["given_name"])
-	lastName := fmt.Sprint(payload.Claims["family_name"])
+	name := fmt.Sprint(payload.Claims["given_name"]) + fmt.Sprint(payload.Claims["family_name"])
 	pfp := fmt.Sprint(payload.Claims["picture"])
 
 	user := models.User{
 		Email:  email,
-		Name:   firstName + " " + lastName,
+		Name:   name,
 		PFPUrl: pfp,
+		Lang:   strings.ToLower(whatlanggo.DetectLang(name).String()),
 	}
 
 	err = h.UserRepo.Create(&user)

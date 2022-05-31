@@ -65,10 +65,9 @@ func (h *AuthHandler) register(c *gin.Context) {
 	pfp := fmt.Sprint(payload.Claims["picture"])
 
 	user := models.User{
-		Email:     email,
-		FirstName: firstName,
-		LastName:  lastName,
-		PFPUrl:    pfp,
+		Email:  email,
+		Name:   firstName + " " + lastName,
+		PFPUrl: pfp,
 	}
 
 	err = h.UserRepo.Create(&user)

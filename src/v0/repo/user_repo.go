@@ -73,7 +73,7 @@ func (r *UserRepo) FindByQuery(keywords []string, page int) ([]models.User, erro
 	var results []models.User
 
 	tx := r.db.
-		Where("name @@ to_tsquery('english', ?)", strings.Join(keywords, "&")).
+		Where("ts @@ to_tsquery('english', ?)", strings.Join(keywords, "&")).
 		Limit(20).
 		Offset(20 * page).
 		Find(&results)

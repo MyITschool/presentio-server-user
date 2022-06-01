@@ -76,6 +76,7 @@ func (r *UserRepo) FindByQuery(keywords []string, page int) ([]models.User, erro
 		Where("ts @@ to_tsquery('english', ?)", strings.Join(keywords, "&")).
 		Limit(20).
 		Offset(20 * page).
+		Order("users.id DESC").
 		Find(&results)
 
 	return results, tx.Error

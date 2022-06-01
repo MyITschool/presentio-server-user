@@ -60,14 +60,13 @@ func (h *AuthHandler) register(c *gin.Context) {
 		return
 	}
 
-	name := fmt.Sprint(payload.Claims["given_name"]) + fmt.Sprint(payload.Claims["family_name"])
+	name := fmt.Sprint(payload.Claims["given_name"]) + " " + fmt.Sprint(payload.Claims["family_name"])
 	pfp := fmt.Sprint(payload.Claims["picture"])
 
 	user := models.User{
 		Email:  email,
 		Name:   name,
 		PFPUrl: pfp,
-		Lang:   util.GetLang(name),
 	}
 
 	err = h.UserRepo.Create(&user)
